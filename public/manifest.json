@@ -1,0 +1,19 @@
+{
+	"manifest_version": 3,
+	"name": "Nepton Handler",
+	"version": "0.1.0",
+	"description": "Automate your Nepton daily activity logging",
+	"action": {
+		"default_popup": "index.html",
+		"default_icon": {
+			"16": "nepton.png",
+			"48": "nepton.png",
+			"128": "nepton.png"
+		}
+	},
+	"icons": {
+		"16": "nepton.png",
+		"48": "nepton.png",
+		"128": "nepton.png"
+	}
+}
