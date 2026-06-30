@@ -16,7 +16,7 @@ function roundUpTo5Min(): string {
 		m = 0;
 		h = (h + 1) % 24;
 	}
-	return String(h).padStart(2, "0") + String(m).padStart(2, "0");
+	return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
 function todayISO(): string {
