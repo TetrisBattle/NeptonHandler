@@ -1,77 +1,77 @@
-import { useState } from "react";
+import { useState } from 'react'
 import {
 	createTabOpenWatcher,
 	getActiveTab,
 	waitForTabLoad,
-} from "../utils/chromeTab";
-import { clickDateEntry, fillEndTime, fillStartTime } from "../utils/nepton";
+} from '../utils/chromeTab'
+import { clickDateEntry, fillEndTime, fillStartTime } from '../utils/nepton'
 
-export type Status = "idle" | "success" | "not-found" | "error";
+export type Status = 'idle' | 'success' | 'notFound' | 'error'
 
-function roundUpTo5Min(): string {
-	const d = new Date();
-	let h = d.getHours();
-	let m = Math.ceil(d.getMinutes() / 5) * 5;
+export function roundUpTo5Min(): string {
+	const d = new Date()
+	let h = d.getHours()
+	let m = Math.ceil(d.getMinutes() / 5) * 5
 	if (m === 60) {
-		m = 0;
-		h = (h + 1) % 24;
+		m = 0
+		h = (h + 1) % 24
 	}
-	return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+	return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
 }
 
-function todayISO(): string {
-	const d = new Date();
+export function todayISO(): string {
+	const d = new Date()
 	return [
 		d.getFullYear(),
-		String(d.getMonth() + 1).padStart(2, "0"),
-		String(d.getDate()).padStart(2, "0"),
-	].join("-");
+		String(d.getMonth() + 1).padStart(2, '0'),
+		String(d.getDate()).padStart(2, '0'),
+	].join('-')
 }
 
 export function useAddEntry() {
-	const [date, setDate] = useState(todayISO);
-	const [startTime, setStartTime] = useState("");
-	const [endTime, setEndTime] = useState(roundUpTo5Min);
-	const [status, setStatus] = useState<Status>("idle");
-	const [diagnostic, setDiagnostic] = useState("");
+	const [date, setDate] = useState(todayISO)
+	const [startTime, setStartTime] = useState('')
+	const [endTime, setEndTime] = useState(roundUpTo5Min)
+	const [status, setStatus] = useState<Status>('idle')
+	const [diagnostic, setDiagnostic] = useState('')
 
 	async function handleAdd() {
-		setStatus("idle");
-		setDiagnostic("");
+		setStatus('idle')
+		setDiagnostic('')
 
 		try {
-			const tab = await getActiveTab();
+			const tab = await getActiveTab()
 			if (tab.id == null) {
-				setStatus("error");
-				return;
+				setStatus('error')
+				return
 			}
 
 			// Attach listener before the click so the popup-open event is never missed
-			const { promise: newTabIdPromise, cancel } = createTabOpenWatcher();
+			const { promise: newTabIdPromise, cancel } = createTabOpenWatcher()
 
-			const { clicked, diagnostic: msg } = await clickDateEntry(tab.id, date);
+			const { clicked, diagnostic: msg } = await clickDateEntry(tab.id, date)
 			if (!clicked) {
-				cancel();
-				setDiagnostic(msg);
-				setStatus("not-found");
-				return;
+				cancel()
+				setDiagnostic(msg)
+				setStatus('notFound')
+				return
 			}
 
-			const newTabId = await newTabIdPromise;
-			await waitForTabLoad(newTabId);
+			const newTabId = await newTabIdPromise
+			await waitForTabLoad(newTabId)
 
 			if (startTime) {
-				await fillStartTime(newTabId, startTime);
+				await fillStartTime(newTabId, startTime)
 			}
 
 			if (endTime) {
-				await fillEndTime(newTabId, endTime);
+				await fillEndTime(newTabId, endTime)
 			}
 
-			setStatus("success");
+			setStatus('success')
 		} catch (e) {
-			setDiagnostic(String(e));
-			setStatus("error");
+			setDiagnostic(String(e))
+			setStatus('error')
 		}
 	}
 
@@ -85,5 +85,5 @@ export function useAddEntry() {
 		status,
 		diagnostic,
 		handleAdd,
-	};
+	}
 }
