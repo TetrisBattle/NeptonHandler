@@ -4,7 +4,12 @@ import {
 	getActiveTab,
 	waitForTabLoad,
 } from '../utils/chromeTab'
-import { clickDateEntry, fillEndTime, fillStartTime } from '../utils/nepton'
+import {
+	clickDateEntry,
+	fillEndTime,
+	fillStartTime,
+	selectProject,
+} from '../utils/nepton'
 
 export type Status = 'idle' | 'success' | 'notFound' | 'error'
 
@@ -35,7 +40,7 @@ export function useAddEntry() {
 	const [status, setStatus] = useState<Status>('idle')
 	const [diagnostic, setDiagnostic] = useState('')
 
-	async function handleAdd() {
+	async function handleAdd(neptonProjectId?: string) {
 		setStatus('idle')
 		setDiagnostic('')
 
@@ -66,6 +71,10 @@ export function useAddEntry() {
 
 			if (endTime) {
 				await fillEndTime(newTabId, endTime)
+			}
+
+			if (neptonProjectId) {
+				await selectProject(newTabId, neptonProjectId)
 			}
 
 			setStatus('success')

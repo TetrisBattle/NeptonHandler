@@ -130,7 +130,14 @@ export default function App() {
 						fullWidth
 					/>
 
-					<Button variant='contained' onClick={handleAdd} fullWidth>
+					<Button
+						variant='contained'
+						onClick={() => {
+							const cfg = configs.find((c) => c.id === selectedProjectId)
+							handleAdd(cfg?.projectId)
+						}}
+						fullWidth
+					>
 						Add
 					</Button>
 
