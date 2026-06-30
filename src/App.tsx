@@ -134,7 +134,7 @@ export default function App() {
 						variant='contained'
 						onClick={() => {
 							const cfg = configs.find((c) => c.id === selectedProjectId)
-							handleAdd(cfg?.projectId)
+							handleAdd(cfg?.projectId, cfg?.code)
 						}}
 						fullWidth
 					>

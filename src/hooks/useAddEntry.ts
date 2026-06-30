@@ -40,7 +40,7 @@ export function useAddEntry() {
 	const [status, setStatus] = useState<Status>('idle')
 	const [diagnostic, setDiagnostic] = useState('')
 
-	async function handleAdd(neptonProjectId?: string) {
+	async function handleAdd(neptonProjectId?: string, code?: string) {
 		setStatus('idle')
 		setDiagnostic('')
 
@@ -74,7 +74,7 @@ export function useAddEntry() {
 			}
 
 			if (neptonProjectId) {
-				await selectProject(newTabId, neptonProjectId)
+				await selectProject(newTabId, neptonProjectId, code)
 			}
 
 			setStatus('success')

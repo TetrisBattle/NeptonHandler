@@ -79,10 +79,14 @@ export async function fillEndTime(tabId: number, time: string): Promise<void> {
 export async function selectProject(
 	tabId: number,
 	projectId: string,
+	code?: string,
 ): Promise<{ selected: boolean; msg: string }> {
 	const results = await chrome.scripting.executeScript({
 		target: { tabId },
-		func: async (pid: string): Promise<{ selected: boolean; msg: string }> => {
+		func: async (
+			pid: string,
+			noteCode: string,
+		): Promise<{ selected: boolean; msg: string }> => {
 			// 1. Find the search input by its known class.
 			const searchInput = document.querySelector<HTMLInputElement>(
 				'input.singleNodeSearchInputBox',
@@ -139,13 +143,55 @@ export async function selectProject(
 				}, 100)
 			})
 			if (!node)
-				return { selected: false, msg: `no visible leaf node found after filter` }
+				return {
+					selected: false,
+					msg: `no visible leaf node found after filter`,
+				}
 
 			// 6. Click the result.
 			node.click()
+
+			// 7. Always open the notes section.
+			document
+				.querySelector<HTMLElement>('button.projectNoteInputToggle')
+				?.click()
+
+			// 8. Wait for the internal notes textarea to appear.
+			const internalNotes = await new Promise<HTMLTextAreaElement | null>(
+				(resolve) => {
+					const deadline = Date.now() + 3000
+					const id = setInterval(() => {
+						const el = document.querySelector<HTMLTextAreaElement>(
+							'textarea.projectNoteInput.internalNotes',
+						)
+						if (el) {
+							clearInterval(id)
+							resolve(el)
+						} else if (Date.now() > deadline) {
+							clearInterval(id)
+							resolve(null)
+						}
+					}, 100)
+				},
+			)
+
+			// 9. Fill internal notes with code if provided.
+			if (internalNotes && noteCode) {
+				internalNotes.value = noteCode
+				internalNotes.dispatchEvent(new Event('input', { bubbles: true }))
+				internalNotes.dispatchEvent(new Event('change', { bubbles: true }))
+			}
+
+			// 10. Always focus the public notes textarea.
+			document
+				.querySelector<HTMLTextAreaElement>(
+					'textarea.projectNoteInput.publicNotes',
+				)
+				?.focus()
+
 			return { selected: true, msg: 'search result clicked' }
 		},
-		args: [projectId],
+		args: [projectId, code ?? ''],
 	})
 
 	return results[0]?.result ?? { selected: false, msg: 'no result from script' }
