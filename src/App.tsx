@@ -8,7 +8,7 @@ import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { type Status, useAddEntry } from './hooks/useAddEntry'
 import { useProjectConfigs } from './hooks/useProjectConfigs'
 import SettingsView from './SettingsView'
@@ -31,7 +31,25 @@ const statusColors: Record<Status, string | undefined> = {
 export default function App() {
 	const [view, setView] = useState<'main' | 'settings'>('main')
 	const [selectedProjectId, setSelectedProjectId] = useState('')
-	const { configs, addConfig, updateConfig, removeConfig } = useProjectConfigs()
+	const {
+		configs,
+		loading,
+		defaultProjectId,
+		addConfig,
+		updateConfig,
+		removeConfig,
+		setDefaultProject,
+	} = useProjectConfigs()
+	const defaultApplied = useRef(false)
+
+	useEffect(() => {
+		if (!loading && !defaultApplied.current) {
+			defaultApplied.current = true
+			if (defaultProjectId) {
+				setSelectedProjectId(defaultProjectId)
+			}
+		}
+	}, [loading, defaultProjectId])
 	const {
 		date,
 		setDate,
@@ -76,9 +94,11 @@ export default function App() {
 				<SettingsView
 					onBack={() => setView('main')}
 					configs={configs}
+					defaultProjectId={defaultProjectId}
 					onAdd={addConfig}
 					onUpdate={updateConfig}
 					onRemove={removeConfig}
+					onSetDefault={setDefaultProject}
 				/>
 			) : (
 				<>

@@ -44,6 +44,7 @@ declare namespace chrome {
 		interface StorageArea {
 			get(keys: string | string[] | null): Promise<Record<string, unknown>>
 			set(items: Record<string, unknown>): Promise<void>
+			remove(keys: string | string[]): Promise<void>
 		}
 		const local: StorageArea
 		const sync: StorageArea

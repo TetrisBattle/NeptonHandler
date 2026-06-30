@@ -1,6 +1,8 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
+import StarIcon from '@mui/icons-material/Star'
+import StarBorderIcon from '@mui/icons-material/StarBorder'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
@@ -12,17 +14,21 @@ import type { ProjectConfig } from './hooks/useProjectConfigs'
 type Props = {
 	onBack: () => void
 	configs: ProjectConfig[]
+	defaultProjectId: string | null
 	onAdd: (projectId: string, name: string, code?: string) => void
 	onRemove: (id: string) => void
 	onUpdate: (id: string, patch: Partial<Omit<ProjectConfig, 'id'>>) => void
+	onSetDefault: (id: string | null) => void
 }
 
 export default function SettingsView({
 	onBack,
 	configs,
+	defaultProjectId,
 	onAdd,
 	onRemove,
 	onUpdate,
+	onSetDefault,
 }: Readonly<Props>) {
 	const [name, setName] = useState('')
 	const [projectId, setProjectId] = useState('')
@@ -64,7 +70,6 @@ export default function SettingsView({
 		<Box
 			sx={{
 				p: 2,
-				minWidth: 320,
 				display: 'flex',
 				flexDirection: 'column',
 				gap: 2,
@@ -183,6 +188,19 @@ export default function SettingsView({
 							>
 								<Typography variant='body2'>{c.name}</Typography>
 								<Box>
+									<IconButton
+										size='small'
+										onClick={() =>
+											onSetDefault(defaultProjectId === c.id ? null : c.id)
+										}
+										aria-label={`Set ${c.name} as default project`}
+									>
+										{defaultProjectId === c.id ? (
+											<StarIcon fontSize='small' color='primary' />
+										) : (
+											<StarBorderIcon fontSize='small' />
+										)}
+									</IconButton>
 									<IconButton
 										size='small'
 										onClick={() => startEdit(c)}
