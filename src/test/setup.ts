@@ -17,6 +17,12 @@ const chromeMock = {
 	scripting: {
 		executeScript: vi.fn(),
 	},
+	storage: {
+		local: {
+			get: vi.fn().mockResolvedValue({}),
+			set: vi.fn().mockResolvedValue(undefined),
+		},
+	},
 }
 
 Object.defineProperty(globalThis, 'chrome', {

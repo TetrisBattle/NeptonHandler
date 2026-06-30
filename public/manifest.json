@@ -3,7 +3,7 @@
 	"name": "Nepton Handler",
 	"version": "0.1.0",
 	"description": "Automate your Nepton daily activity logging",
-	"permissions": ["activeTab", "scripting"],
+	"permissions": ["activeTab", "scripting", "storage"],
 	"host_permissions": ["<all_urls>"],
 	"action": {
 		"default_popup": "index.html",
