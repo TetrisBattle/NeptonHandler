@@ -65,9 +65,7 @@ export function useAddEntry() {
 			const newTabId = await newTabIdPromise
 			await waitForTabLoad(newTabId)
 
-			if (startTime) {
-				await fillStartTime(newTabId, startTime)
-			}
+			await fillStartTime(newTabId, startTime || '08:00')
 
 			if (endTime) {
 				await fillEndTime(newTabId, endTime)
