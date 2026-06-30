@@ -4,9 +4,20 @@ import {
 	getActiveTab,
 	waitForTabLoad,
 } from "../utils/chromeTab";
-import { clickDateEntry, fillStartTime } from "../utils/nepton";
+import { clickDateEntry, fillEndTime, fillStartTime } from "../utils/nepton";
 
 export type Status = "idle" | "success" | "not-found" | "error";
+
+function roundUpTo5Min(): string {
+	const d = new Date();
+	let h = d.getHours();
+	let m = Math.ceil(d.getMinutes() / 5) * 5;
+	if (m === 60) {
+		m = 0;
+		h = (h + 1) % 24;
+	}
+	return String(h).padStart(2, "0") + String(m).padStart(2, "0");
+}
 
 function todayISO(): string {
 	const d = new Date();
@@ -20,6 +31,7 @@ function todayISO(): string {
 export function useAddEntry() {
 	const [date, setDate] = useState(todayISO);
 	const [startTime, setStartTime] = useState("");
+	const [endTime, setEndTime] = useState(roundUpTo5Min);
 	const [status, setStatus] = useState<Status>("idle");
 	const [diagnostic, setDiagnostic] = useState("");
 
@@ -52,6 +64,10 @@ export function useAddEntry() {
 				await fillStartTime(newTabId, startTime);
 			}
 
+			if (endTime) {
+				await fillEndTime(newTabId, endTime);
+			}
+
 			setStatus("success");
 		} catch (e) {
 			setDiagnostic(String(e));
@@ -64,6 +80,8 @@ export function useAddEntry() {
 		setDate,
 		startTime,
 		setStartTime,
+		endTime,
+		setEndTime,
 		status,
 		diagnostic,
 		handleAdd,

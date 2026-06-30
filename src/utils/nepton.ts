@@ -54,6 +54,24 @@ export async function clickDateEntry(
 	return { clicked, diagnostic: diagnostic || "no result from any frame" };
 }
 
+/** Fills the end-time input in the Nepton popup tab. */
+export async function fillEndTime(tabId: number, time: string): Promise<void> {
+	await chrome.scripting.executeScript({
+		target: { tabId },
+		func: (t: string) => {
+			const input =
+				document.querySelector<HTMLInputElement>("#Activity_endTime");
+			if (!input) return;
+			input.focus();
+			input.select();
+			input.value = t;
+			input.dispatchEvent(new Event("input", { bubbles: true }));
+			input.dispatchEvent(new Event("change", { bubbles: true }));
+		},
+		args: [time],
+	});
+}
+
 /** Fills the start-time input in the Nepton popup tab. */
 export async function fillStartTime(
 	tabId: number,

@@ -24,6 +24,8 @@ export default function App() {
 		setDate,
 		startTime,
 		setStartTime,
+		endTime,
+		setEndTime,
 		status,
 		diagnostic,
 		handleAdd,
@@ -56,6 +58,14 @@ export default function App() {
 				placeholder="TTMM"
 				value={startTime}
 				onChange={(e) => setStartTime(e.target.value)}
+				fullWidth
+			/>
+
+			<TextField
+				label="End time"
+				placeholder="TTMM"
+				value={endTime}
+				onChange={(e) => setEndTime(e.target.value)}
 				fullWidth
 			/>
 
