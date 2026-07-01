@@ -64,12 +64,8 @@ export function useAddEntry() {
 
 			const newTabId = await newTabIdPromise
 			await waitForTabLoad(newTabId)
-
 			await fillStartTime(newTabId, startTime || '08:00')
-
-			if (endTime) {
-				await fillEndTime(newTabId, endTime)
-			}
+			await fillEndTime(newTabId, endTime)
 
 			if (neptonProjectId) {
 				await selectProject(newTabId, neptonProjectId, code)
