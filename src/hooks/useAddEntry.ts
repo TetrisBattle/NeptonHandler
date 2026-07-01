@@ -7,6 +7,7 @@ import {
 import {
 	clickDateEntry,
 	fillEndTime,
+	fillProjectNotes,
 	fillStartTime,
 	selectProject,
 } from '../utils/nepton'
@@ -68,7 +69,8 @@ export function useAddEntry() {
 			await fillEndTime(newTabId, endTime)
 
 			if (neptonProjectId) {
-				await selectProject(newTabId, neptonProjectId, code)
+				await selectProject(newTabId, neptonProjectId)
+				await fillProjectNotes(newTabId, code)
 			}
 
 			setStatus('success')
