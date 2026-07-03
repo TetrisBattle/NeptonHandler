@@ -32,28 +32,28 @@ export default function SettingsView({
 }: Readonly<Props>) {
 	const [name, setName] = useState('')
 	const [projectId, setProjectId] = useState('')
-	const [code, setCode] = useState('')
+	const [internalCode, setInternalCode] = useState('')
 
 	const [editingId, setEditingId] = useState<string | null>(null)
 	const [editName, setEditName] = useState('')
 	const [editProjectId, setEditProjectId] = useState('')
-	const [editCode, setEditCode] = useState('')
+	const [editInternalCode, setEditInternalCode] = useState('')
 
 	function handleAdd() {
 		const trimmedName = name.trim()
 		const trimmedId = projectId.trim()
 		if (!trimmedName || !trimmedId) return
-		onAdd(trimmedId, trimmedName, code.trim() || undefined)
+		onAdd(trimmedId, trimmedName, internalCode.trim() || undefined)
 		setName('')
 		setProjectId('')
-		setCode('')
+		setInternalCode('')
 	}
 
 	function startEdit(c: ProjectConfig) {
 		setEditingId(c.id)
 		setEditName(c.name)
 		setEditProjectId(c.projectId)
-		setEditCode(c.code ?? '')
+		setEditInternalCode(c.code ?? '')
 	}
 
 	function handleSave() {
@@ -61,7 +61,7 @@ export default function SettingsView({
 		onUpdate(editingId, {
 			name: editName.trim(),
 			projectId: editProjectId.trim(),
-			code: editCode.trim() || undefined,
+			code: editInternalCode.trim() || undefined,
 		})
 		setEditingId(null)
 	}
@@ -98,9 +98,9 @@ export default function SettingsView({
 					fullWidth
 				/>
 				<TextField
-					label='Code (optional)'
-					value={code}
-					onChange={(e) => setCode(e.target.value)}
+					label='Internal code (optional)'
+					value={internalCode}
+					onChange={(e) => setInternalCode(e.target.value)}
 					size='small'
 					fullWidth
 				/>
@@ -147,9 +147,9 @@ export default function SettingsView({
 									fullWidth
 								/>
 								<TextField
-									label='Code (optional)'
-									value={editCode}
-									onChange={(e) => setEditCode(e.target.value)}
+									label='Internal code (optional)'
+									value={editInternalCode}
+									onChange={(e) => setEditInternalCode(e.target.value)}
 									size='small'
 									fullWidth
 								/>

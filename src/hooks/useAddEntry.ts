@@ -58,8 +58,8 @@ export function useAddEntry() {
 			const { clicked, diagnostic: msg } = await clickDateEntry(tab.id, date)
 			if (!clicked) {
 				cancel()
-				setDiagnostic(msg)
 				setStatus('notFound')
+				setDiagnostic(msg)
 				return
 			}
 
@@ -75,8 +75,8 @@ export function useAddEntry() {
 
 			setStatus('success')
 		} catch (e) {
-			setDiagnostic(String(e))
 			setStatus('error')
+			setDiagnostic(String(e))
 		}
 	}
 

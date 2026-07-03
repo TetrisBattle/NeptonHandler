@@ -58,7 +58,6 @@ export default function App() {
 		endTime,
 		setEndTime,
 		status,
-		diagnostic,
 		handleAdd,
 	} = useAddEntry()
 
@@ -164,15 +163,6 @@ export default function App() {
 					{status !== 'idle' && (
 						<Typography variant='body2' sx={{ color: statusColors[status] }}>
 							{statusMessages[status]}
-						</Typography>
-					)}
-
-					{diagnostic && (
-						<Typography
-							variant='caption'
-							sx={{ color: 'text.secondary', wordBreak: 'break-all' }}
-						>
-							{diagnostic}
 						</Typography>
 					)}
 				</>
