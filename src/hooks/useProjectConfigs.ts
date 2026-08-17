@@ -69,8 +69,12 @@ export function useProjectConfigs() {
 		}
 	}
 
+	const sortedConfigs = [...configs].sort((a, b) =>
+		a.name.localeCompare(b.name),
+	)
+
 	return {
-		configs,
+		configs: sortedConfigs,
 		loading,
 		defaultProjectId,
 		addConfig,

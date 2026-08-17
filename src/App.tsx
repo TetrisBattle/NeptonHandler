@@ -97,7 +97,10 @@ export default function App() {
 					onAdd={addConfig}
 					onUpdate={updateConfig}
 					onRemove={removeConfig}
-					onSetDefault={setDefaultProject}
+					onSetDefault={(id) => {
+						setDefaultProject(id)
+						if (id) setSelectedProjectId(id)
+					}}
 				/>
 			) : (
 				<>
