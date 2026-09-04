@@ -44,6 +44,10 @@ export function useAddEntry() {
 	async function handleAdd(neptonProjectId?: string, code?: string) {
 		setStatus('idle')
 		setDiagnostic('')
+		if (!date) {
+			setStatus('error')
+			return
+		}
 
 		try {
 			const tab = await getActiveTab()

@@ -8,6 +8,8 @@ import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import dayjs from 'dayjs'
 import { useEffect, useRef, useState } from 'react'
 import { type Status, useAddEntry } from './hooks/useAddEntry'
 import { useProjectConfigs } from './hooks/useProjectConfigs'
@@ -123,13 +125,12 @@ export default function App() {
 						</Select>
 					</FormControl>
 
-					<TextField
+					<DatePicker
 						label='Date'
-						type='date'
-						value={date}
-						onChange={(e) => setDate(e.target.value)}
-						slotProps={{ inputLabel: { shrink: true } }}
-						fullWidth
+						format='DD.MM.YYYY'
+						value={dayjs(date)}
+						onChange={(value) => setDate(value?.format('YYYY-MM-DD') ?? '')}
+						slotProps={{ textField: { fullWidth: true } }}
 					/>
 
 					<TextField
