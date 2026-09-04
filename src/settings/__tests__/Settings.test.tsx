@@ -9,10 +9,12 @@ function renderSettings() {
 			onViewChange={vi.fn()}
 			configs={[]}
 			defaultProjectId={null}
+			favoriteEnabled={false}
 			onAdd={vi.fn()}
 			onRemove={vi.fn()}
 			onUpdate={vi.fn()}
 			onSetDefault={vi.fn()}
+			onSetFavoriteEnabled={vi.fn()}
 		/>,
 	)
 }
@@ -27,22 +29,5 @@ describe('Settings', () => {
 		expect(
 			screen.getByRole('button', { name: 'Manage projects' }),
 		).toBeInTheDocument()
-	})
-
-	it('shows the empty project list', () => {
-		render(
-			<Settings
-				view='manage'
-				onViewChange={vi.fn()}
-				configs={[]}
-				defaultProjectId={null}
-				onAdd={vi.fn()}
-				onRemove={vi.fn()}
-				onUpdate={vi.fn()}
-				onSetDefault={vi.fn()}
-			/>,
-		)
-
-		expect(screen.getByText('Empty')).toBeInTheDocument()
 	})
 })

@@ -11,7 +11,7 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import dayjs from 'dayjs'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { type Status, useAddEntry } from './hooks/useAddEntry'
 import { useProjectConfigs } from './hooks/useProjectConfigs'
 import Settings from './settings/Settings'
@@ -35,17 +35,18 @@ export default function App() {
 	const [view, setView] = useState<
 		'main' | 'settings' | 'addProject' | 'manageProjects'
 	>('main')
-	const [selectedProjectId, setSelectedProjectId] = useState('')
 	const {
 		configs,
-		loading,
 		defaultProjectId,
+		favoriteEnabled,
+		selectedProjectId,
 		addConfig,
 		updateConfig,
 		removeConfig,
 		setDefaultProject,
+		setFavoriteEnabled,
+		setSelectedProject,
 	} = useProjectConfigs()
-	const defaultApplied = useRef(false)
 	const {
 		date,
 		setDate,
@@ -56,15 +57,6 @@ export default function App() {
 		status,
 		handleAdd,
 	} = useAddEntry()
-
-	useEffect(() => {
-		if (!loading && !defaultApplied.current) {
-			defaultApplied.current = true
-			if (defaultProjectId) {
-				setSelectedProjectId(defaultProjectId)
-			}
-		}
-	}, [loading, defaultProjectId])
 
 	return (
 		<Box
@@ -129,13 +121,12 @@ export default function App() {
 					}
 					configs={configs}
 					defaultProjectId={defaultProjectId}
+					favoriteEnabled={favoriteEnabled}
 					onAdd={addConfig}
 					onUpdate={updateConfig}
 					onRemove={removeConfig}
-					onSetDefault={(id) => {
-						setDefaultProject(id)
-						if (id) setSelectedProjectId(id)
-					}}
+					onSetDefault={setDefaultProject}
+					onSetFavoriteEnabled={setFavoriteEnabled}
 				/>
 			) : (
 				<>
@@ -145,7 +136,7 @@ export default function App() {
 							labelId='project-select-label'
 							value={selectedProjectId}
 							label='Project'
-							onChange={(e) => setSelectedProjectId(e.target.value)}
+							onChange={(e) => setSelectedProject(e.target.value)}
 						>
 							<MenuItem value=''>
 								<em>— No project —</em>
@@ -193,6 +184,7 @@ export default function App() {
 							handleAdd(cfg?.projectId, cfg?.code)
 						}}
 						fullWidth
+						sx={{ fontWeight: 600 }}
 					>
 						Add
 					</Button>

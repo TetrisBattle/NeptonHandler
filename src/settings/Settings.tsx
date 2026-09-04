@@ -9,10 +9,12 @@ type Props = {
 	onViewChange: (view: 'add' | 'manage') => void
 	configs: ProjectConfig[]
 	defaultProjectId: string | null
+	favoriteEnabled: boolean
 	onAdd: (projectId: string, name: string, code?: string) => void
 	onRemove: (id: string) => void
 	onUpdate: (id: string, patch: Partial<Omit<ProjectConfig, 'id'>>) => void
 	onSetDefault: (id: string | null) => void
+	onSetFavoriteEnabled: (enabled: boolean) => void
 }
 
 export default function Settings({
@@ -20,10 +22,12 @@ export default function Settings({
 	onViewChange,
 	configs,
 	defaultProjectId,
+	favoriteEnabled,
 	onAdd,
 	onRemove,
 	onUpdate,
 	onSetDefault,
+	onSetFavoriteEnabled,
 }: Readonly<Props>) {
 	if (view === 'add') {
 		return <AddProject onAdd={onAdd} />
@@ -34,9 +38,11 @@ export default function Settings({
 			<ManageProjects
 				configs={configs}
 				defaultProjectId={defaultProjectId}
+				favoriteEnabled={favoriteEnabled}
 				onRemove={onRemove}
 				onUpdate={onUpdate}
 				onSetDefault={onSetDefault}
+				onSetFavoriteEnabled={onSetFavoriteEnabled}
 			/>
 		)
 	}

@@ -1,11 +1,14 @@
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
+import Switch from '@mui/material/Switch'
 import TextField from '@mui/material/TextField'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 import type { ProjectConfig } from '../hooks/useProjectConfigs'
@@ -13,17 +16,21 @@ import type { ProjectConfig } from '../hooks/useProjectConfigs'
 type Props = {
 	configs: ProjectConfig[]
 	defaultProjectId: string | null
+	favoriteEnabled: boolean
 	onRemove: (id: string) => void
 	onUpdate: (id: string, patch: Partial<Omit<ProjectConfig, 'id'>>) => void
 	onSetDefault: (id: string | null) => void
+	onSetFavoriteEnabled: (enabled: boolean) => void
 }
 
 export default function ManageProjects({
 	configs,
 	defaultProjectId,
+	favoriteEnabled,
 	onRemove,
 	onUpdate,
 	onSetDefault,
+	onSetFavoriteEnabled,
 }: Readonly<Props>) {
 	const [editingId, setEditingId] = useState<string | null>(null)
 	const [editName, setEditName] = useState('')
@@ -56,6 +63,21 @@ export default function ManageProjects({
 				gap: 2,
 			}}
 		>
+			<Box sx={{ display: 'flex', alignItems: 'center' }}>
+				<Box
+					sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexGrow: 1 }}
+				>
+					<Typography>Favorite</Typography>
+					<Tooltip title='Set default project'>
+						<InfoOutlinedIcon fontSize='small' />
+					</Tooltip>
+				</Box>
+				<Switch
+					checked={favoriteEnabled}
+					onChange={(_, checked) => onSetFavoriteEnabled(checked)}
+					slotProps={{ input: { 'aria-label': 'Favorite' } }}
+				/>
+			</Box>
 			{configs.length === 0 ? (
 				<Typography variant='body2' sx={{ color: 'text.secondary' }}>
 					Empty
@@ -131,21 +153,23 @@ export default function ManageProjects({
 							>
 								<Typography variant='body2'>{config.name}</Typography>
 								<Box>
-									<IconButton
-										size='small'
-										onClick={() =>
-											onSetDefault(
-												defaultProjectId === config.id ? null : config.id,
-											)
-										}
-										aria-label={`Set ${config.name} as default project`}
-									>
-										{defaultProjectId === config.id ? (
-											<StarIcon fontSize='small' color='primary' />
-										) : (
-											<StarBorderIcon fontSize='small' />
-										)}
-									</IconButton>
+									{favoriteEnabled && (
+										<IconButton
+											size='small'
+											onClick={() =>
+												onSetDefault(
+													defaultProjectId === config.id ? null : config.id,
+												)
+											}
+											aria-label={`Set ${config.name} as default project`}
+										>
+											{defaultProjectId === config.id ? (
+												<StarIcon fontSize='small' color='primary' />
+											) : (
+												<StarBorderIcon fontSize='small' />
+											)}
+										</IconButton>
+									)}
 									<IconButton
 										size='small'
 										onClick={() => startEdit(config)}

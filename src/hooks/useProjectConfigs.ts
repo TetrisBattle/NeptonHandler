@@ -9,24 +9,43 @@ export type ProjectConfig = {
 
 const STORAGE_KEY = 'projectConfigs'
 const DEFAULT_KEY = 'defaultProjectId'
+const FAVORITE_ENABLED_KEY = 'favoriteEnabled'
+const SELECTED_PROJECT_KEY = 'selectedProjectId'
 
 export function useProjectConfigs() {
 	const [configs, setConfigs] = useState<ProjectConfig[]>([])
 	const [loading, setLoading] = useState(true)
 	const [defaultProjectId, setDefaultProjectId] = useState<string | null>(null)
+	const [favoriteEnabled, setFavoriteEnabledState] = useState(false)
+	const [selectedProjectId, setSelectedProjectId] = useState('')
 
 	useEffect(() => {
-		chrome.storage.local.get([STORAGE_KEY, DEFAULT_KEY]).then((result) => {
-			const stored = result[STORAGE_KEY]
-			if (Array.isArray(stored)) {
-				setConfigs(stored as ProjectConfig[])
-			}
-			const storedDefault = result[DEFAULT_KEY]
-			if (typeof storedDefault === 'string') {
-				setDefaultProjectId(storedDefault)
-			}
-			setLoading(false)
-		})
+		chrome.storage.local
+			.get([
+				STORAGE_KEY,
+				DEFAULT_KEY,
+				FAVORITE_ENABLED_KEY,
+				SELECTED_PROJECT_KEY,
+			])
+			.then((result) => {
+				const stored = result[STORAGE_KEY]
+				if (Array.isArray(stored)) {
+					setConfigs(stored as ProjectConfig[])
+				}
+				const storedFavoriteEnabled = result[FAVORITE_ENABLED_KEY] === true
+				setFavoriteEnabledState(storedFavoriteEnabled)
+				const storedDefault = result[DEFAULT_KEY]
+				const storedSelectedProject = result[SELECTED_PROJECT_KEY]
+				if (storedFavoriteEnabled) {
+					if (typeof storedDefault === 'string') {
+						setDefaultProjectId(storedDefault)
+						setSelectedProjectId(storedDefault)
+					}
+				} else if (typeof storedSelectedProject === 'string') {
+					setSelectedProjectId(storedSelectedProject)
+				}
+				setLoading(false)
+			})
 	}, [])
 
 	async function addConfig(projectId: string, name: string, code?: string) {
@@ -58,6 +77,10 @@ export function useProjectConfigs() {
 			setDefaultProjectId(null)
 			await chrome.storage.local.remove(DEFAULT_KEY)
 		}
+		if (selectedProjectId === id) {
+			setSelectedProjectId('')
+			await chrome.storage.local.remove(SELECTED_PROJECT_KEY)
+		}
 	}
 
 	async function setDefaultProject(id: string | null) {
@@ -65,7 +88,32 @@ export function useProjectConfigs() {
 		if (id === null) {
 			await chrome.storage.local.remove(DEFAULT_KEY)
 		} else {
-			await chrome.storage.local.set({ [DEFAULT_KEY]: id })
+			setSelectedProjectId(id)
+			await chrome.storage.local.set({
+				[DEFAULT_KEY]: id,
+				[SELECTED_PROJECT_KEY]: id,
+			})
+		}
+	}
+
+	async function setFavoriteEnabled(enabled: boolean) {
+		setFavoriteEnabledState(enabled)
+		setDefaultProjectId(null)
+		await chrome.storage.local.set({
+			[FAVORITE_ENABLED_KEY]: enabled,
+			[DEFAULT_KEY]: null,
+			...(selectedProjectId
+				? { [SELECTED_PROJECT_KEY]: selectedProjectId }
+				: {}),
+		})
+	}
+
+	async function setSelectedProject(id: string) {
+		setSelectedProjectId(id)
+		if (id) {
+			await chrome.storage.local.set({ [SELECTED_PROJECT_KEY]: id })
+		} else {
+			await chrome.storage.local.remove(SELECTED_PROJECT_KEY)
 		}
 	}
 
@@ -77,9 +125,13 @@ export function useProjectConfigs() {
 		configs: sortedConfigs,
 		loading,
 		defaultProjectId,
+		favoriteEnabled,
+		selectedProjectId,
 		addConfig,
 		updateConfig,
 		removeConfig,
 		setDefaultProject,
+		setFavoriteEnabled,
+		setSelectedProject,
 	}
 }
