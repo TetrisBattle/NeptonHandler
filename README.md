@@ -30,11 +30,21 @@ npm run dev
 
 ### Load the Extension in Chrome
 
+#### First-time setup
+
 1. Run `npm run build` to generate the `dist/` folder.
 2. Open Chrome and navigate to `chrome://extensions`.
 3. Enable **Developer mode** (toggle in the top-right corner).
 4. Click **Load unpacked** and select the `dist/` folder.
 5. The Nepton Handler icon will appear in your toolbar.
+
+#### After making changes
+
+If the extension is already loaded in Chrome:
+
+1. Run `npm run build` again.
+2. Open `chrome://extensions`.
+3. Find **Nepton Handler** and click the **Reload** button.
 
 ---
 
