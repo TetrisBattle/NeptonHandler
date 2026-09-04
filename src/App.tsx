@@ -1,3 +1,4 @@
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SettingsIcon from '@mui/icons-material/Settings'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -13,7 +14,7 @@ import dayjs from 'dayjs'
 import { useEffect, useRef, useState } from 'react'
 import { type Status, useAddEntry } from './hooks/useAddEntry'
 import { useProjectConfigs } from './hooks/useProjectConfigs'
-import SettingsView from './SettingsView'
+import Settings from './settings/Settings'
 import { handleTimeChange, normalizeTimeOnBlur } from './utils/timeHelpers'
 
 const statusMessages: Record<Status, string> = {
@@ -31,7 +32,9 @@ const statusColors: Record<Status, string | undefined> = {
 }
 
 export default function App() {
-	const [view, setView] = useState<'main' | 'settings'>('main')
+	const [view, setView] = useState<
+		'main' | 'settings' | 'addProject' | 'manageProjects'
+	>('main')
 	const [selectedProjectId, setSelectedProjectId] = useState('')
 	const {
 		configs,
@@ -43,15 +46,6 @@ export default function App() {
 		setDefaultProject,
 	} = useProjectConfigs()
 	const defaultApplied = useRef(false)
-
-	useEffect(() => {
-		if (!loading && !defaultApplied.current) {
-			defaultApplied.current = true
-			if (defaultProjectId) {
-				setSelectedProjectId(defaultProjectId)
-			}
-		}
-	}, [loading, defaultProjectId])
 	const {
 		date,
 		setDate,
@@ -62,6 +56,15 @@ export default function App() {
 		status,
 		handleAdd,
 	} = useAddEntry()
+
+	useEffect(() => {
+		if (!loading && !defaultApplied.current) {
+			defaultApplied.current = true
+			if (defaultProjectId) {
+				setSelectedProjectId(defaultProjectId)
+			}
+		}
+	}, [loading, defaultProjectId])
 
 	return (
 		<Box
@@ -81,19 +84,49 @@ export default function App() {
 					justifyContent: 'space-between',
 				}}
 			>
-				<Typography variant='h6'>Nepton Handler</Typography>
-				<IconButton
-					size='small'
-					onClick={() => setView('settings')}
-					aria-label='Settings'
-				>
-					<SettingsIcon fontSize='small' />
-				</IconButton>
+				{view !== 'main' ? (
+					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+						<IconButton
+							size='small'
+							onClick={() => setView(view === 'settings' ? 'main' : 'settings')}
+							aria-label='Back'
+						>
+							<ArrowBackIcon fontSize='small' />
+						</IconButton>
+						<Typography variant='h6'>
+							{view === 'settings'
+								? 'Settings'
+								: view === 'addProject'
+									? 'Add new project'
+									: 'Manage projects'}
+						</Typography>
+					</Box>
+				) : (
+					<>
+						<Typography variant='h6'>Nepton Handler</Typography>
+						<IconButton
+							size='small'
+							onClick={() => setView('settings')}
+							aria-label='Settings'
+						>
+							<SettingsIcon fontSize='small' />
+						</IconButton>
+					</>
+				)}
 			</Box>
 
-			{view === 'settings' ? (
-				<SettingsView
-					onBack={() => setView('main')}
+			{view !== 'main' ? (
+				<Settings
+					view={
+						view === 'addProject'
+							? 'add'
+							: view === 'manageProjects'
+								? 'manage'
+								: 'menu'
+					}
+					onViewChange={(settingsView) =>
+						setView(settingsView === 'add' ? 'addProject' : 'manageProjects')
+					}
 					configs={configs}
 					defaultProjectId={defaultProjectId}
 					onAdd={addConfig}

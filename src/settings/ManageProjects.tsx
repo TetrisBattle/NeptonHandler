@@ -1,4 +1,3 @@
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import StarIcon from '@mui/icons-material/Star'
@@ -9,51 +8,33 @@ import IconButton from '@mui/material/IconButton'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { useState } from 'react'
-import type { ProjectConfig } from './hooks/useProjectConfigs'
+import type { ProjectConfig } from '../hooks/useProjectConfigs'
 
 type Props = {
-	onBack: () => void
 	configs: ProjectConfig[]
 	defaultProjectId: string | null
-	onAdd: (projectId: string, name: string, code?: string) => void
 	onRemove: (id: string) => void
 	onUpdate: (id: string, patch: Partial<Omit<ProjectConfig, 'id'>>) => void
 	onSetDefault: (id: string | null) => void
 }
 
-export default function SettingsView({
-	onBack,
+export default function ManageProjects({
 	configs,
 	defaultProjectId,
-	onAdd,
 	onRemove,
 	onUpdate,
 	onSetDefault,
 }: Readonly<Props>) {
-	const [name, setName] = useState('')
-	const [projectId, setProjectId] = useState('')
-	const [internalCode, setInternalCode] = useState('')
-
 	const [editingId, setEditingId] = useState<string | null>(null)
 	const [editName, setEditName] = useState('')
 	const [editProjectId, setEditProjectId] = useState('')
 	const [editInternalCode, setEditInternalCode] = useState('')
 
-	function handleAdd() {
-		const trimmedName = name.trim()
-		const trimmedId = projectId.trim()
-		if (!trimmedName || !trimmedId) return
-		onAdd(trimmedId, trimmedName, internalCode.trim() || undefined)
-		setName('')
-		setProjectId('')
-		setInternalCode('')
-	}
-
-	function startEdit(c: ProjectConfig) {
-		setEditingId(c.id)
-		setEditName(c.name)
-		setEditProjectId(c.projectId)
-		setEditInternalCode(c.code ?? '')
+	function startEdit(config: ProjectConfig) {
+		setEditingId(config.id)
+		setEditName(config.name)
+		setEditProjectId(config.projectId)
+		setEditInternalCode(config.code ?? '')
 	}
 
 	function handleSave() {
@@ -75,54 +56,16 @@ export default function SettingsView({
 				gap: 2,
 			}}
 		>
-			<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-				<IconButton size='small' onClick={onBack} aria-label='Back'>
-					<ArrowBackIcon fontSize='small' />
-				</IconButton>
-				<Typography variant='h6'>Project settings</Typography>
-			</Box>
-
-			<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-				<TextField
-					label='Name'
-					value={name}
-					onChange={(e) => setName(e.target.value)}
-					size='small'
-					fullWidth
-				/>
-				<TextField
-					label='Project ID'
-					value={projectId}
-					onChange={(e) => setProjectId(e.target.value)}
-					size='small'
-					fullWidth
-				/>
-				<TextField
-					label='Internal code (optional)'
-					value={internalCode}
-					onChange={(e) => setInternalCode(e.target.value)}
-					size='small'
-					fullWidth
-				/>
-				<Button
-					variant='contained'
-					onClick={handleAdd}
-					disabled={!name.trim() || !projectId.trim()}
-					fullWidth
-				>
-					Add project
-				</Button>
-			</Box>
-
-			{configs.length > 0 && (
+			{configs.length === 0 ? (
+				<Typography variant='body2' sx={{ color: 'text.secondary' }}>
+					Empty
+				</Typography>
+			) : (
 				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-					<Typography variant='caption' sx={{ color: 'text.secondary' }}>
-						Saved projects
-					</Typography>
-					{configs.map((c) =>
-						editingId === c.id ? (
+					{configs.map((config) =>
+						editingId === config.id ? (
 							<Box
-								key={c.id}
+								key={config.id}
 								sx={{
 									display: 'flex',
 									flexDirection: 'column',
@@ -135,21 +78,21 @@ export default function SettingsView({
 								<TextField
 									label='Name'
 									value={editName}
-									onChange={(e) => setEditName(e.target.value)}
+									onChange={(event) => setEditName(event.target.value)}
 									size='small'
 									fullWidth
 								/>
 								<TextField
 									label='Project ID'
 									value={editProjectId}
-									onChange={(e) => setEditProjectId(e.target.value)}
+									onChange={(event) => setEditProjectId(event.target.value)}
 									size='small'
 									fullWidth
 								/>
 								<TextField
 									label='Internal code (optional)'
 									value={editInternalCode}
-									onChange={(e) => setEditInternalCode(e.target.value)}
+									onChange={(event) => setEditInternalCode(event.target.value)}
 									size='small'
 									fullWidth
 								/>
@@ -175,7 +118,7 @@ export default function SettingsView({
 							</Box>
 						) : (
 							<Box
-								key={c.id}
+								key={config.id}
 								sx={{
 									display: 'flex',
 									alignItems: 'center',
@@ -186,16 +129,18 @@ export default function SettingsView({
 									bgcolor: 'action.hover',
 								}}
 							>
-								<Typography variant='body2'>{c.name}</Typography>
+								<Typography variant='body2'>{config.name}</Typography>
 								<Box>
 									<IconButton
 										size='small'
 										onClick={() =>
-											onSetDefault(defaultProjectId === c.id ? null : c.id)
+											onSetDefault(
+												defaultProjectId === config.id ? null : config.id,
+											)
 										}
-										aria-label={`Set ${c.name} as default project`}
+										aria-label={`Set ${config.name} as default project`}
 									>
-										{defaultProjectId === c.id ? (
+										{defaultProjectId === config.id ? (
 											<StarIcon fontSize='small' color='primary' />
 										) : (
 											<StarBorderIcon fontSize='small' />
@@ -203,15 +148,15 @@ export default function SettingsView({
 									</IconButton>
 									<IconButton
 										size='small'
-										onClick={() => startEdit(c)}
-										aria-label={`Edit project ${c.name}`}
+										onClick={() => startEdit(config)}
+										aria-label={`Edit project ${config.name}`}
 									>
 										<EditIcon fontSize='small' />
 									</IconButton>
 									<IconButton
 										size='small'
-										onClick={() => onRemove(c.id)}
-										aria-label={`Remove project ${c.name}`}
+										onClick={() => onRemove(config.id)}
+										aria-label={`Remove project ${config.name}`}
 									>
 										<DeleteIcon fontSize='small' />
 									</IconButton>

@@ -38,6 +38,51 @@ describe('App', () => {
 		expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument()
 	})
 
+	it('shows the settings title and back button in the top bar', async () => {
+		renderApp()
+
+		await userEvent.click(screen.getByRole('button', { name: 'Settings' }))
+
+		expect(
+			screen.getByRole('heading', { name: 'Settings' }),
+		).toBeInTheDocument()
+		expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
+		expect(screen.queryByText('Nepton Handler')).not.toBeInTheDocument()
+
+		await userEvent.click(
+			screen.getByRole('button', { name: 'Add new project' }),
+		)
+
+		expect(
+			screen.getByRole('heading', { name: 'Add new project' }),
+		).toBeInTheDocument()
+		expect(
+			screen.queryByRole('heading', { name: 'Settings' }),
+		).not.toBeInTheDocument()
+
+		await userEvent.click(screen.getByRole('button', { name: 'Back' }))
+		expect(
+			screen.getByRole('heading', { name: 'Settings' }),
+		).toBeInTheDocument()
+
+		await userEvent.click(
+			screen.getByRole('button', { name: 'Manage projects' }),
+		)
+
+		expect(
+			screen.getByRole('heading', { name: 'Manage projects' }),
+		).toBeInTheDocument()
+
+		await userEvent.click(screen.getByRole('button', { name: 'Back' }))
+		expect(
+			screen.getByRole('heading', { name: 'Settings' }),
+		).toBeInTheDocument()
+
+		await userEvent.click(screen.getByRole('button', { name: 'Back' }))
+
+		expect(screen.getByText('Nepton Handler')).toBeInTheDocument()
+	})
+
 	it('does not show a status message initially', () => {
 		renderApp()
 		expect(screen.queryByText(/done!/i)).not.toBeInTheDocument()
