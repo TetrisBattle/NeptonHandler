@@ -153,4 +153,69 @@ describe('useProjectConfigs', () => {
 		expect(reopened.result.current.defaultProjectId).toBeNull()
 		expect(reopened.result.current.selectedProjectId).toBe('project-a')
 	})
+
+	it('exports the current configuration', async () => {
+		storageGet.mockResolvedValue({
+			projectConfigs: [{ id: 'project-1', name: 'One', projectId: '1' }],
+			favoriteEnabled: true,
+			defaultProjectId: 'project-1',
+			selectedProjectId: 'project-1',
+		})
+
+		const { result } = renderHook(() => useProjectConfigs())
+		await waitFor(() => expect(result.current.loading).toBe(false))
+
+		expect(result.current.exportConfig()).toEqual({
+			projectConfigs: [{ id: 'project-1', name: 'One', projectId: '1' }],
+			favoriteEnabled: true,
+			defaultProjectId: 'project-1',
+			selectedProjectId: 'project-1',
+		})
+	})
+
+	it('imports and persists a complete configuration', async () => {
+		storageGet.mockResolvedValue({})
+		const { result } = renderHook(() => useProjectConfigs())
+		await waitFor(() => expect(result.current.loading).toBe(false))
+
+		await act(() =>
+			result.current.importConfig({
+				projectConfigs: [{ id: 'project-2', name: 'Two', projectId: '2' }],
+				favoriteEnabled: true,
+				defaultProjectId: 'project-2',
+				selectedProjectId: 'project-2',
+			}),
+		)
+
+		expect(result.current.configs).toEqual([
+			{ id: 'project-2', name: 'Two', projectId: '2' },
+		])
+		expect(result.current.defaultProjectId).toBe('project-2')
+		expect(result.current.favoriteEnabled).toBe(true)
+		expect(result.current.selectedProjectId).toBe('project-2')
+		expect(storageSet).toHaveBeenCalledWith({
+			projectConfigs: [{ id: 'project-2', name: 'Two', projectId: '2' }],
+			defaultProjectId: 'project-2',
+			favoriteEnabled: true,
+			selectedProjectId: 'project-2',
+		})
+	})
+
+	it('rejects invalid imports without changing storage', async () => {
+		storageGet.mockResolvedValue({})
+		const { result } = renderHook(() => useProjectConfigs())
+		await waitFor(() => expect(result.current.loading).toBe(false))
+
+		await expect(
+			result.current.importConfig({
+				projectConfigs: [],
+				favoriteEnabled: false,
+				defaultProjectId: null,
+				selectedProjectId: 'missing-project',
+			}),
+		).rejects.toThrow('missing selected project')
+
+		expect(storageSet).not.toHaveBeenCalled()
+		expect(result.current.configs).toEqual([])
+	})
 })

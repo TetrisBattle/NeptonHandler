@@ -46,6 +46,8 @@ export default function App() {
 		setDefaultProject,
 		setFavoriteEnabled,
 		setSelectedProject,
+		exportConfig,
+		importConfig,
 	} = useProjectConfigs()
 	const {
 		date,
@@ -127,6 +129,8 @@ export default function App() {
 					onRemove={removeConfig}
 					onSetDefault={setDefaultProject}
 					onSetFavoriteEnabled={setFavoriteEnabled}
+					onExport={exportConfig}
+					onImport={importConfig}
 				/>
 			) : (
 				<>

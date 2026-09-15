@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react'
-
-export type ProjectConfig = {
-	id: string
-	name: string
-	projectId: string
-	code?: string
-}
+import {
+	type NeptonHandlerConfig,
+	type ProjectConfig,
+	parseNeptonHandlerConfig,
+} from '../utils/neptonHandlerConfig'
 
 const STORAGE_KEY = 'projectConfigs'
 const DEFAULT_KEY = 'defaultProjectId'
@@ -117,6 +115,29 @@ export function useProjectConfigs() {
 		}
 	}
 
+	function exportConfig(): NeptonHandlerConfig {
+		return {
+			projectConfigs: configs,
+			defaultProjectId,
+			favoriteEnabled,
+			selectedProjectId,
+		}
+	}
+
+	async function importConfig(value: unknown) {
+		const imported = parseNeptonHandlerConfig(value)
+		await chrome.storage.local.set({
+			[STORAGE_KEY]: imported.projectConfigs,
+			[DEFAULT_KEY]: imported.defaultProjectId,
+			[FAVORITE_ENABLED_KEY]: imported.favoriteEnabled,
+			[SELECTED_PROJECT_KEY]: imported.selectedProjectId,
+		})
+		setConfigs(imported.projectConfigs)
+		setDefaultProjectId(imported.defaultProjectId)
+		setFavoriteEnabledState(imported.favoriteEnabled)
+		setSelectedProjectId(imported.selectedProjectId)
+	}
+
 	const sortedConfigs = [...configs].sort((a, b) =>
 		a.name.localeCompare(b.name),
 	)
@@ -133,5 +154,7 @@ export function useProjectConfigs() {
 		setDefaultProject,
 		setFavoriteEnabled,
 		setSelectedProject,
+		exportConfig,
+		importConfig,
 	}
 }
